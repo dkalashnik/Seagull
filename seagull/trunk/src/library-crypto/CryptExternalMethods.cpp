@@ -327,8 +327,9 @@ int create_algo_MD5_radius(char          *  P_msg,
                            unsigned char *  P_result) {
   int        L_ret         = 0 ;
   int        L_size_shared = 0 ;
-  char       *p, *msg_secret;
+  char       *p, *msg_secret, *tmp;
   int        i;
+  unsigned char   zero_auth[16] = { 0 };
   //MD5_CTX    L_Md5Ctx ;
 
   if (P_shared_secret != NULL) {
@@ -346,6 +347,10 @@ int create_algo_MD5_radius(char          *  P_msg,
 
   msg_secret = (char *)malloc(P_msg_size + L_size_shared);
   memcpy(msg_secret, P_msg, P_msg_size);
+
+  tmp = msg_secret + 4;
+  memcpy(tmp, zero_auth, 16);
+
   p = msg_secret + P_msg_size;
   memcpy(p, P_shared_secret, L_size_shared);
 
