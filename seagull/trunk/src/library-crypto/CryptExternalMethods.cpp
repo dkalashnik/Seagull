@@ -22,13 +22,13 @@
 #include "string_t.hpp"
 #include <regex.h>
 
-#define GEN_ERROR(l,a) iostream_error << a << iostream_endl << iostream_flush ; 
+#define GEN_ERROR(l,a) iostream_error << a << iostream_endl << iostream_flush ;
 
 
 
 extern char *stristr (const char *s1, const char *s2) ;
 extern int createAuthHeaderMD5(char * user, char * password, char * method,
-                               char * uri, char * msgbody, char * auth, 
+                               char * uri, char * msgbody, char * auth,
                                char * algo, char * result);
 extern int createAuthHeaderAKAv1MD5(char * user, char * OP,
                                     char * AMF,
@@ -53,12 +53,12 @@ char* external_find_text_value (char *P_buf, char *P_field) {
   size_t     L_size = 0 ;
 
   string_t   L_string = "" ;
-  
+
   L_string  = "([[:blank:]]*" ;
   L_string += P_field ;
   L_string += "[[:blank:]]*=[[:blank:]]*)([^;]+)";
 
-  L_status = regcomp (&L_reg_expr, 
+  L_status = regcomp (&L_reg_expr,
 		      L_string.c_str(),
 		      REG_EXTENDED) ;
 
@@ -66,7 +66,7 @@ char* external_find_text_value (char *P_buf, char *P_field) {
     regerror(L_status, &L_reg_expr, L_buffer, 100);
     regfree (&L_reg_expr) ;
   } else {
-  
+
     L_status = regexec (&L_reg_expr, P_buf, 3, L_pmatch, 0) ;
     regfree (&L_reg_expr) ;
     if (L_status == 0) {
@@ -74,17 +74,17 @@ char* external_find_text_value (char *P_buf, char *P_field) {
       ALLOC_TABLE(L_value, char*, sizeof(char), L_size+1);
       memcpy(L_value, &(P_buf[L_pmatch[2].rm_so]), L_size);
       L_value[L_size]='\0' ;
-    } 
+    }
   }
   return (L_value);
 }
 
 typedef struct _crypto_args_string {
-  char * m_user; 
-  char * m_password; 
+  char * m_user;
+  char * m_password;
   char * m_method;
-  char * m_uri; 
-  char * m_auth; 
+  char * m_uri;
+  char * m_auth;
   int    m_algo_id;
   char * m_algo ;
   char * m_aka_k ;
@@ -96,28 +96,28 @@ typedef struct _crypto_args_string {
 
 static const T_CryptoArgsStr Crypto_Args_Str_init = {
   NULL,
-  NULL , 
+  NULL ,
   NULL,
   NULL,
-  NULL, 
+  NULL,
   -1,
   NULL,
   NULL,
   NULL,
   NULL,
-  NULL 
+  NULL
 } ;
 
 
 int check_algorithm(char * auth) {
-  
+
   char algo[32]="MD5";
   char *start, *end;
-  
+
   if ((start = stristr(auth, "Digest")) == NULL) {
     return (-1);
   }
-  
+
   if ((start = stristr(auth, "algorithm=")) != NULL) {
     start = start + strlen("algorithm=");
     if (*start == '"') { start++; }
@@ -125,7 +125,7 @@ int check_algorithm(char * auth) {
     strncpy(algo, start, end - start);
     algo[end - start] ='\0';
   }
-  
+
   if (strncasecmp(algo, "MD5", 3)==0) {
     return (0);
   } else if (strncasecmp(algo, "AKAv1-MD5", 9)==0) {
@@ -148,7 +148,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
     L_ret = -1;
     return (L_ret);
   }
-  
+
   P_result->m_method = external_find_text_value((char*)P_args->m_value.m_val_binary.m_value,
                                                 (char*)"method")  ;
   if (P_result->m_method == NULL ) {
@@ -157,7 +157,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
     L_ret = -1;
     return (L_ret);
   }
-  
+
   P_result->m_uri = external_find_text_value((char*)P_args->m_value.m_val_binary.m_value,
                                         (char*)"uri")  ;
   if (P_result->m_uri == NULL ) {
@@ -185,7 +185,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
   }
 
   // MD5 only
-  if (P_result->m_algo_id == 0) { // MD5 
+  if (P_result->m_algo_id == 0) { // MD5
 
     ALLOC_TABLE(P_result->m_algo, char*, sizeof(char), 4);
     strcpy(P_result->m_algo, (char*)"MD5");
@@ -199,7 +199,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
       return (L_ret);
     }
 
-    
+
   } else {
 
     ALLOC_TABLE(P_result->m_algo, char*, sizeof(char), 10);
@@ -214,7 +214,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
       L_ret = -1;
       return (L_ret);
     }
-    
+
     P_result->m_aka_amf = external_find_text_value((char*)P_args->m_value.m_val_binary.m_value,
                                                    (char*)"aka_amf")  ;
     if (P_result->m_aka_amf == NULL ) {
@@ -223,7 +223,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
       L_ret = -1;
       return (L_ret);
     }
-    
+
     P_result->m_aka_k = external_find_text_value((char*)P_args->m_value.m_val_binary.m_value,
                                         (char*)"aka_k")  ;
     if (P_result->m_aka_k == NULL ) {
@@ -241,7 +241,7 @@ int crypto_args_analysis (T_pValueData  P_args, T_pCryptoArgsStr P_result) {
 int crypto_method (T_pValueData  P_msgPart,
                    T_pValueData  P_args,
                    T_pValueData  P_result) {
-  
+
   int             L_ret    = 0    ;
   T_CryptoArgsStr L_crypto ;
   char            L_result [2049] ;
@@ -258,7 +258,7 @@ int crypto_method (T_pValueData  P_msgPart,
                                   L_crypto.m_algo,
                                   L_result);
     } else {
-      L_ret = createAuthHeaderAKAv1MD5(L_crypto.m_user, 
+      L_ret = createAuthHeaderAKAv1MD5(L_crypto.m_user,
                                        L_crypto.m_aka_op,
                                        L_crypto.m_aka_amf,
                                        L_crypto.m_aka_k,
@@ -274,7 +274,7 @@ int crypto_method (T_pValueData  P_msgPart,
       ALLOC_TABLE(P_result->m_value.m_val_binary.m_value,
                   unsigned char*,
                   sizeof(unsigned char),
-                  strlen(L_result));      
+                  strlen(L_result));
       P_result->m_value.m_val_binary.m_size = strlen(L_result);
       memcpy(P_result->m_value.m_val_binary.m_value, L_result, strlen(L_result));
     } else {
@@ -282,11 +282,11 @@ int crypto_method (T_pValueData  P_msgPart,
     }
   }
 
-  FREE_TABLE(L_crypto.m_user); 
-  FREE_TABLE(L_crypto.m_password); 
+  FREE_TABLE(L_crypto.m_user);
+  FREE_TABLE(L_crypto.m_password);
   FREE_TABLE(L_crypto.m_method);
-  FREE_TABLE(L_crypto.m_uri); 
-  FREE_TABLE(L_crypto.m_auth); 
+  FREE_TABLE(L_crypto.m_uri);
+  FREE_TABLE(L_crypto.m_auth);
   FREE_TABLE(L_crypto.m_algo );
   FREE_TABLE(L_crypto.m_aka_k );
   FREE_TABLE(L_crypto.m_aka_op );
@@ -296,8 +296,8 @@ int crypto_method (T_pValueData  P_msgPart,
   return (L_ret);
 }
 
-/** Analyze arguments for radius protocol 
-  * \param P_args uses to determine the shared secret 
+/** Analyze arguments for radius protocol
+  * \param P_args uses to determine the shared secret
   * \param P_result contains the shared secret
   * \return 0 if OK
   */
@@ -314,8 +314,8 @@ int crypto_args_analysis_radius (T_pValueData  P_args, T_pCryptoArgsStr P_result
 }
 
 
-/** Authentication algorithm for radius protocol 
-  * \param P_msgPart uses to calculate the key   
+/** Authentication algorithm for radius protocol
+  * \param P_msgPart uses to calculate the key
   * \param P_args contains the shared secret
   * \param P_result contains the result of this algorithm
   * \return 0 if OK
@@ -326,25 +326,36 @@ int create_algo_MD5_radius(char          *  P_msg,
                            unsigned char *  P_result) {
   int        L_ret         = 0 ;
   int        L_size_shared = 0 ;
-  
-  MD5_CTX    L_Md5Ctx ;
+  char       *p, *msg_secret;
+
+  //MD5_CTX    L_Md5Ctx ;
 
   if (P_shared_secret != NULL) {
     L_size_shared = strlen(P_shared_secret);
   }
 
+  /*
   MD5_Init(&L_Md5Ctx);
   if (L_size_shared > 0) {
     MD5_Update(&L_Md5Ctx, P_shared_secret, L_size_shared);
   }
   MD5_Update(&L_Md5Ctx, P_msg, P_msg_size);
   MD5_Final(P_result, &L_Md5Ctx);
+  */
+
+  msg_secret = (char *)malloc(P_msg_size + L_size_shared);
+  memcpy(msg_secret, P_msg, P_msg_size);
+  p = msg_secret + P_msg_size;
+  memcpy(p, P_shared_secret, L_size_shared);
+
+  MD5((unsigned char *)msg_secret, P_msg_size + L_size_shared, P_result);
+  free(msg_secret);
 
   return (L_ret);
 }
 
-/** Authentication method for radius protocol 
-  * \param P_msgPart uses to calculate the key   
+/** Authentication method for radius protocol
+  * \param P_msgPart uses to calculate the key
   * \param P_args contains the shared secret
   * \param P_result contains the result of this method
   * \return 0 if OK
@@ -352,7 +363,7 @@ int create_algo_MD5_radius(char          *  P_msg,
 int crypto_method_radius (T_pValueData  P_msgPart,
                           T_pValueData  P_args,
                           T_pValueData  P_result) {
-  
+
   int             L_ret    = 0    ;
   T_CryptoArgsStr L_crypto        ;
   unsigned char   L_result [16]   ;
@@ -369,10 +380,10 @@ int crypto_method_radius (T_pValueData  P_msgPart,
       ALLOC_TABLE(P_result->m_value.m_val_binary.m_value,
                   unsigned char*,
                   sizeof(unsigned char),
-                  16);      
+                  16);
       P_result->m_value.m_val_binary.m_size = 16;
       memcpy(P_result->m_value.m_val_binary.m_value, L_result, 16);
-    } 
+    }
   }
 
   FREE_TABLE(L_crypto.m_shared_secret );
