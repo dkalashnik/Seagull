@@ -24,7 +24,7 @@ RUN    tar czf /root/bin.tgz ~/opt/src/seagull/seagull/trunk/src/bin/* \
 
 FROM ubuntu:18.04 as distro
 RUN    apt update \
-    && apt install -y ksh locales \
+    && apt install -y ksh locales libssl1.0.0 libssl-dev \
     && apt upgrade -y \
     && locale-gen en_US.UTF-8 \
     && dpkg-reconfigure --frontend noninteractive locales \
@@ -44,3 +44,5 @@ RUN    tar xzf /root/pkg.tgz -C /root --strip=1 \
     && mkdir -p /opt/seagull/synchro-env/logs \
     && mkdir -p /opt/seagull/xcap-env/logs
 RUN rm -f /root/*.tgz
+ENV LD_LIBRARY_PATH=/usr/local/bin
+CMD ["/bin/bash"]
