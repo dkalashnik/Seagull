@@ -21,6 +21,7 @@
 #include "Utils.hpp"
 #include "string_t.hpp"
 #include <regex.h>
+#include <stdio.h>
 
 #define GEN_ERROR(l,a) iostream_error << a << iostream_endl << iostream_flush ;
 
@@ -327,6 +328,7 @@ int create_algo_MD5_radius(char          *  P_msg,
   int        L_ret         = 0 ;
   int        L_size_shared = 0 ;
   char       *p, *msg_secret;
+  int        i;
   //MD5_CTX    L_Md5Ctx ;
 
   if (P_shared_secret != NULL) {
@@ -346,6 +348,10 @@ int create_algo_MD5_radius(char          *  P_msg,
   memcpy(msg_secret, P_msg, P_msg_size);
   p = msg_secret + P_msg_size;
   memcpy(p, P_shared_secret, L_size_shared);
+
+  for (i = 0; i < P_msg_size + L_size_shared; i++)
+    fprintf(stderr, " %02x", ((unsigned char*)msg_secret)[i]);
+  putc('\n', stderr);
 
   MD5((unsigned char *)msg_secret, P_msg_size + L_size_shared, P_result);
   free(msg_secret);
