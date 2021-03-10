@@ -328,7 +328,7 @@ int create_algo_MD5_radius(char          *  P_msg,
   int        L_ret         = 0 ;
   int        L_size_shared = 0 ;
   char       *p, *msg_secret, *tmp;
-  int        i;
+  // int        i;
   unsigned char   zero_auth[16] = { 0 };
   //MD5_CTX    L_Md5Ctx ;
 
@@ -354,9 +354,9 @@ int create_algo_MD5_radius(char          *  P_msg,
   p = msg_secret + P_msg_size;
   memcpy(p, P_shared_secret, L_size_shared);
 
-  for (i = 0; i < P_msg_size + L_size_shared; i++)
-    fprintf(stderr, " %02x", ((unsigned char*)msg_secret)[i]);
-  putc('\n', stderr);
+  // for (i = 0; i < P_msg_size + L_size_shared; i++)
+  //   fprintf(stderr, " %02x", ((unsigned char*)msg_secret)[i]);
+  // putc('\n', stderr);
 
   MD5((unsigned char *)msg_secret, P_msg_size + L_size_shared, P_result);
   free(msg_secret);
